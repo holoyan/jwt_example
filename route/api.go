@@ -6,5 +6,6 @@ import (
 )
 
 func Register()  {
-	http.HandleFunc("/", handlers.Index)
+	http.HandleFunc("/tokens", handlers.IssueTokens)
+	http.HandleFunc("/tokens/update", handlers.UpdateTokens)
 }

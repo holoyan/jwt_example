@@ -5,6 +5,10 @@ import (
 	"fmt"
 )
 
-func Index(res http.ResponseWriter, req *http.Request)  {
-	fmt.Fprintln(res, "Welcome to the Home Page!")
+func IssueTokens(res http.ResponseWriter, req *http.Request)  {
+	fmt.Fprintln(res, "Access and refresh token")
+}
+
+func UpdateTokens(res http.ResponseWriter, req *http.Request)  {
+	fmt.Fprintln(res, "Update tokens")
 }
