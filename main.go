@@ -7,6 +7,6 @@ import (
 
 func main() {
 	route.Register()
-
+	core.Load()
 	core.Run()
 }
