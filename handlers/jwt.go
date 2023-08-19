@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"net/http"
 	"fmt"
+	"net/http"
 )
 
 func IssueTokens(res http.ResponseWriter, req *http.Request)  {
@@ -11,4 +11,6 @@ func IssueTokens(res http.ResponseWriter, req *http.Request)  {
 
 func UpdateTokens(res http.ResponseWriter, req *http.Request)  {
 	fmt.Fprintln(res, "Update tokens")
+
+	fmt.Println("Document inserted successfully!")
 }
