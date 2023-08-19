@@ -9,4 +9,5 @@ func main() {
 	route.Register()
 	core.Load()
 	core.Run()
+	core.Close()
 }
