@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
@@ -18,4 +19,8 @@ func Load()  {
 
 	DbClient = Connect()
 	DB = DbClient.Database(os.Getenv("MONGO_DATABASE"))
+}
+
+func Close()  {
+	defer DbClient.Disconnect(context.Background())
 }

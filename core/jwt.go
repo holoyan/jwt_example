@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func GenerateJwt(userId string, jti string, expiresIn time.Duration) string {
+func GenerateJwt(sub string, jti string, expiresIn time.Duration) string {
 	// Define the header and payload for the JWT
 	header := map[string]interface{}{
 		"alg": "HS256",
@@ -19,7 +19,7 @@ func GenerateJwt(userId string, jti string, expiresIn time.Duration) string {
 	}
 
 	payload := map[string]interface{}{
-		"sub": userId,
+		"sub": sub,
 		"exp": time.Now().Add(time.Hour * expiresIn).Unix(),
 		"jti": jti,
 	}
@@ -39,7 +39,7 @@ func GenerateJwt(userId string, jti string, expiresIn time.Duration) string {
 	// Combine the encoded header, payload, and signature to create the JWT
 	jwt := fmt.Sprintf("%s.%s.%s", encodedHeader, encodedPayload, base64.RawURLEncoding.EncodeToString(signature))
 
-	fmt.Println("Generated JWT:", jwt)
+	//fmt.Println("Generated JWT:", jwt)
 
 	return jwt
 }
@@ -69,7 +69,6 @@ type JWTDecoded struct {
 
 func DecodeJwt(jwt string) JWTDecoded {
 	// Replace this with your actual JWT
-
 	secretKey := os.Getenv("SECRET_KEY")
 
 	segments := strings.Split(jwt, ".")

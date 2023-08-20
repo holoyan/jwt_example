@@ -59,15 +59,4 @@ func JsonBody(r *http.Request) map[string]string {
 	}
 
 	return requestBody
-
-	// Access the dynamic keys and their values
-	//for _key, value := range requestBody {
-	//	if _key == key {
-	//		return value
-	//	}
-	//}
-	//
-	//// Access the value by key
-	//errors.New("key not found")
-	//return ""
 }

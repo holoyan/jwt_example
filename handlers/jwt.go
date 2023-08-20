@@ -5,9 +5,7 @@ import (
 	"../models"
 	"context"
 	"encoding/base64"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"net/http"
 )
@@ -40,52 +38,31 @@ func UpdateTokens(res http.ResponseWriter, req *http.Request)  {
 		return
 	}
 
-	coll := core.DB.Collection("access_tokens")
-
-	var result map[string]string
-	objectID, err1 := primitive.ObjectIDFromHex(decodedJwt.Jti)
-	filter := bson.M{"_id": objectID}
-	if err1 != nil {
-		log.Fatal(err1)
-	}
-
-	err := coll.FindOne(context.Background(), filter).Decode(&result)
-	var userId string = result["user_id"]
-	if err != nil {
-		// ErrNoDocuments means that the filter did not match any documents in the collection
-		response["success"] = false
-		if err == mongo.ErrNoDocuments {
-			response["message"] = "Not found"
-			core.JsonResponse(res, response, 404)
-			return
+	// get access token
+	result := core.FindOne("access_tokens", "_id", decodedJwt.Jti)
+	if !result.Success {
+		errorResponse := map[string]interface{} {
+			"message": result.Message,
+			"success": result.Success,
 		}
-		response["message"] = "Something went wrong"
-		core.JsonResponse(res, response, 400)
+		core.JsonResponse(res, errorResponse, 400)
 		return
 	}
+	userId := result.Result["user_id"].(string)
 
 	// get refresh token by accessToken id and compare values
-
-	rColl := core.DB.Collection("refresh_tokens")
-
-	var refreshResult map[string]string
-	refreshFilter := bson.M{"access_token_id": decodedJwt.Jti}
-
-	err5 := rColl.FindOne(context.Background(), refreshFilter).Decode(&refreshResult)
-	if err5 != nil {
-		// ErrNoDocuments means that the filter did not match any documents in the collection
-		response["success"] = false
-		if err5 == mongo.ErrNoDocuments {
-			response["message"] = "refresh Not found"
-			core.JsonResponse(res, response, 404)
-			return
+	refreshTokenResult := core.FindOne("refresh_tokens", "access_token_id", decodedJwt.Jti)
+	//primitive.ObjectID.String()
+	if !refreshTokenResult.Success {
+		errorResponse := map[string]interface{} {
+			"message": refreshTokenResult.Message,
+			"success": refreshTokenResult.Success,
 		}
-		response["message"] = "refresh token: Something went wrong"
-		core.JsonResponse(res, response, 400)
-		log.Fatal(err5)
+		core.JsonResponse(res, errorResponse, 400)
 		return
 	}
-	var hashedToken string = refreshResult["token"]
+
+	hashedToken := refreshTokenResult.Result["token"].(string)
 
 	var decodedRefresh, _ = base64.StdEncoding.DecodeString(refreshToken)
 	if !core.CheckBcrypt(string(decodedRefresh), hashedToken) {
@@ -95,6 +72,11 @@ func UpdateTokens(res http.ResponseWriter, req *http.Request)  {
 		return
 	}
 
+	// remove old access and refresh token
+	core.DeleteOne("access_tokens", "_id", decodedJwt.Jti)
+	core.DeleteOne("refresh_tokens", "_id", refreshTokenResult.Result["_id"].(primitive.ObjectID).Hex())
+
+	// get new
 	var newAccessToken, accessTokenId string = getAccessToken(userId)
 	var newRefreshToken = getRefreshToken(accessTokenId)
 

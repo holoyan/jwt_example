@@ -3,6 +3,8 @@ package core
 import (
 	"context"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -38,26 +40,54 @@ func Connect() *mongo.Client {
 	//defer client.Disconnect(context.Background())
 }
 
-//func findOne(coll string, key string, value string) {
-//	var result map[string]interface{}
-//	objectID, err1 := primitive.ObjectIDFromHex(value)
-//	filter := bson.M{"_id": objectID}
-//	if err1 != nil {
-//		log.Fatal(err1)
-//	}
-//
-//	err := DB.Collection(coll).FindOne(context.Background(), filter).Decode(&result)
-//
-//	if err != nil {
-//		// ErrNoDocuments means that the filter did not match any documents in the collection
-//		response["success"] = false
-//		if err == mongo.ErrNoDocuments {
-//			response["message"] = "Not found"
-//			core.JsonResponse(res, response, 404)
-//			return
-//		}
-//		response["message"] = "Something went wrong"
-//		core.JsonResponse(res, response, 400)
-//		return
-//	}
-//}
+type FindOneResult struct {
+	Success bool
+	Message string
+	Result map[string]interface{}
+}
+
+func FindOne(coll string, key string, value string) FindOneResult {
+	var result map[string]interface{}
+
+	var response FindOneResult
+
+	response.Success = true
+	filter := bson.M{key: value}
+	if key == "_id" {
+		objectId, _ := primitive.ObjectIDFromHex(value)
+		filter[key] = objectId
+	}
+
+	err := DB.Collection(coll).FindOne(context.Background(), filter).Decode(&result)
+
+	if err != nil {
+		// ErrNoDocuments means that the filter did not match any documents in the collection
+		response.Success = false
+		if err == mongo.ErrNoDocuments {
+			response.Message = "Not found"
+			return response
+		}
+		response.Message = "Something went wrong"
+		return response
+	}
+
+	response.Result = result
+
+	return response
+}
+
+func DeleteOne(coll string, key string, value string) bool {
+	filter := bson.M{key: value}
+	if key == "_id" {
+		objectId, _ := primitive.ObjectIDFromHex(value)
+		filter[key] = objectId
+	}
+
+	deleteResult, err := DB.Collection(coll).DeleteOne(context.Background(), filter)
+
+	if err != nil {
+		return false
+	}
+
+	return deleteResult.DeletedCount > 0
+}

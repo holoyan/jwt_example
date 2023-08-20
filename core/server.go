@@ -1,7 +1,6 @@
 package core
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"os"
@@ -11,8 +10,8 @@ import (
 func Run()  {
 	var port = os.Getenv("PORT")
 	// string to int
-	intPort, error := strconv.Atoi(port)
-	if error != nil {
+	intPort, strErr := strconv.Atoi(port)
+	if strErr != nil {
 		// default port
 		intPort = 8080
 	}
@@ -23,8 +22,4 @@ func Run()  {
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
-}
-
-func Close()  {
-	defer DbClient.Disconnect(context.Background())
 }
