@@ -3,9 +3,9 @@ package core
 import (
 	"context"
 	"fmt"
-	"log"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
 	"os"
 )
 
@@ -37,3 +37,27 @@ func Connect() *mongo.Client {
 	// Close the connection when done
 	//defer client.Disconnect(context.Background())
 }
+
+//func findOne(coll string, key string, value string) {
+//	var result map[string]interface{}
+//	objectID, err1 := primitive.ObjectIDFromHex(value)
+//	filter := bson.M{"_id": objectID}
+//	if err1 != nil {
+//		log.Fatal(err1)
+//	}
+//
+//	err := DB.Collection(coll).FindOne(context.Background(), filter).Decode(&result)
+//
+//	if err != nil {
+//		// ErrNoDocuments means that the filter did not match any documents in the collection
+//		response["success"] = false
+//		if err == mongo.ErrNoDocuments {
+//			response["message"] = "Not found"
+//			core.JsonResponse(res, response, 404)
+//			return
+//		}
+//		response["message"] = "Something went wrong"
+//		core.JsonResponse(res, response, 400)
+//		return
+//	}
+//}
