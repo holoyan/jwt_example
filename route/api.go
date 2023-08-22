@@ -1,7 +1,7 @@
 package route
 
 import (
-	"../handlers"
+	"JwtTask/handlers"
 	"net/http"
 )
 

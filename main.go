@@ -1,8 +1,8 @@
 package main
 
 import (
-	"./core"
-	"./route"
+	"JwtTask/core"
+	"JwtTask/route"
 )
 
 func main() {
