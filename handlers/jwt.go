@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"../core"
-	"../models"
+	"JwtTask/core"
+	"JwtTask/models"
 	"context"
 	"encoding/base64"
 	"go.mongodb.org/mongo-driver/bson/primitive"
